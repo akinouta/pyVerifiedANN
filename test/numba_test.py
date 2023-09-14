@@ -3,6 +3,7 @@ from modules.HCNNG.load_dataset import read_fvecs
 import timeit
 import time
 import numpy as np
+from numba import jit, njit
 
 
 def test_sq_d(vectors):

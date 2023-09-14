@@ -1,7 +1,7 @@
 
 from modules.HCNNG.util import squared_euclidean_distance,euclidean_distance
 from modules.HCNNG.load_dataset import read_fvecs
-from modules.HCNNG.minimum_spanning_tree import complete_graph,prim
+from modules.HCNNG.minimum_spanning_tree import *
 import timeit
 from time import time
 import timeit
@@ -13,16 +13,13 @@ import numpy as np
 vectors = read_fvecs("../resource/siftsmall/siftsmall_base.fvecs")
 
 # 示例
-index = np.array(range(100))
-result = complete_graph(index, vectors)
-
-time1=time();
-for i in range(200):
-    prim(result, index)
-time2=time();
-print(rf"prim1:{time2-time1}")
+indexes = np.array(range(10))
+result = complete_graph(indexes, vectors)
 
 
+mst = prim(result, indexes)
+for edge in mst:
+    print(edge)
 
 
 
