@@ -1,8 +1,7 @@
 import random
 
-import numpy as np
 from .minimum_spanning_tree import *
-from modules.HCNNG.util import squared_euclidean_distance, euclidean_distance
+from .util import *
 
 
 def get_two_random_index(indexes):

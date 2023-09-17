@@ -51,3 +51,31 @@ class SPT:
         else:
             s = f"{self.dim}->neg:{str(self.neg)}\n{self.dim}->pos:{str(self.pos)}"
             return s
+
+
+class Trie:
+    def __init__(self):
+        self.children = {}
+        self.is_leaf = False
+
+    def insert(self, word):
+        node = self
+        for char in word:
+            if char not in node.children:
+                node.children[char] = Trie()
+            node = node.children[char]
+            # print(char)
+        node.is_leaf = True
+
+    def __str__(self):
+        return ", ".join(self._print_trie(""))
+
+    def _print_trie(self, current_word):
+        result = []
+        if self.is_leaf:
+            result.append(current_word)
+
+        for char, child_node in self.children.items():
+            result.extend(child_node._print_trie(current_word + char))
+
+        return result

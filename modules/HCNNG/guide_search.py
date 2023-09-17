@@ -1,15 +1,13 @@
-import copy
 import heapq
-from modules.HCNNG.util import squared_euclidean_distance, euclidean_distance
 
-from .data_struct import SPT
+from .util import *
+from .data_structure import *
 
 
 def get_all_neighbors(hcnng, num_vertices):
     neighborss = []
     for num in range(num_vertices):
         neighborss.append([])
-
     for edge in hcnng:
         neighborss[edge.start].append(edge.end)
         neighborss[edge.end].append(edge.start)
@@ -119,7 +117,7 @@ def search_inner(vectors, spts, k, start_index, query_index):
 
 
 def get_guided_tuple(vectors, index, neighbors, cur_dim, judge):
-    guided_tuple = []
+    guided_tuple = dict()
     neg_neighbors = []
     pos_neighbors = []
 
@@ -130,10 +128,10 @@ def get_guided_tuple(vectors, index, neighbors, cur_dim, judge):
             pos_neighbors.append(neighbor)
 
     if not neg_neighbors or not pos_neighbors:
-        return [(judge, neighbors)]
+        return {judge: neighbors}
     else:
-        guided_tuple.extend(get_guided_tuple(vectors, index, neg_neighbors, cur_dim + 1, judge + "0"))
-        guided_tuple.extend(get_guided_tuple(vectors, index, pos_neighbors, cur_dim + 1, judge + "1"))
+        guided_tuple.update(get_guided_tuple(vectors, index, neg_neighbors, cur_dim + 1, judge + "0"))
+        guided_tuple.update(get_guided_tuple(vectors, index, pos_neighbors, cur_dim + 1, judge + "1"))
 
     return guided_tuple
 
@@ -146,19 +144,28 @@ def get_gts(vectors, hcnng):
     return gts
 
 
-def search_neighbors_by_gt(guided_tuple, vector, query):
-    judge = ""
-    max_dim = max([len(leaf_tuple[1]) for leaf_tuple in guided_tuple])
-    for cur_dim in range(max_dim):
-        if vector[cur_dim] < query[cur_dim]:
-            judge.join("0")
+def build_tries(gts):
+    tries = []
+    for gt in gts:
+        trie = Trie()
+        for key in gt.keys():
+            trie.insert(key)
+        tries.append(trie)
+
+    return tries
+
+
+def search_neighbors_by_gt(tire: Trie, gt, vector, query, cur_dim, judge):
+    if tire.is_leaf:
+        return gt[judge]
+    else:
+        if query[cur_dim] < vector[cur_dim]:
+            return search_neighbors_by_gt(tire.children["0"], gt, vector, query, cur_dim + 1, judge + "0")
         else:
-            judge.join("1")
+            return search_neighbors_by_gt(tire.children["1"], gt, vector, query, cur_dim + 1, judge + "1")
 
 
-
-
-def search_by_gts(vectors, spts, k, start_index, query_vector):
+def search_by_gts(vectors, tries, gts, k, start_index, query_vector):
     visited = set()
     # 最小堆-候选集
     candidate = []
@@ -180,7 +187,7 @@ def search_by_gts(vectors, spts, k, start_index, query_vector):
         if len(nearest_neighbors) > k:
             heapq.heappop(nearest_neighbors)
 
-        neighbors = search_neighbors(spts[now_index], vectors[now_index], query_vector, 0)
+        neighbors = search_neighbors_by_gt(tries[now_index], gts[now_index], vectors[now_index], query_vector, 0, "")
         for neighbor in neighbors:
             if neighbor not in visited:
                 visited.add(neighbor)

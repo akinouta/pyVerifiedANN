@@ -1,22 +1,31 @@
+import pickle
+
 import numpy as np
 
 from modules.HCNNG.hcnng import *
 from modules.HCNNG.load_dataset import read_fvecs
 from modules.HCNNG.guide_search import *
+from modules.outsource.MHT import *
+from modules.outsource.verified_search import *
+from modules.outsource.VO import *
 
 vectors = read_fvecs("../resource/siftsmall/siftsmall_base.fvecs")[:20]
 indexes = range(vectors.shape[0])
 
-hcnng = createHCNNG(vectors, indexes, 5, 20)
+# hcnng = createHCNNG(vectors, indexes, 5, 3)
+# with open("hcnng.pkl", "wb") as f:
+#     pickle.dump(hcnng, f)
+
+with open("hcnng.pkl", "rb") as f:
+    hcnng = pickle.load(f)
 print(hcnng)
-num_vertices = vectors.shape[0]
+gts = get_gts(vectors, hcnng)
 
-# spt test
+print(gts)
 
-spts = get_spts(vectors, hcnng)
 test_start = 5
 test_query = 0
-k = 10
+k = 5
 test_query_vector = np.array([0, 16, 35, 5, 32, 31, 14, 10, 11, 78, 55, 10, 45, 83,
                               11, 6, 14, 57, 102, 75, 20, 8, 3, 5, 67, 17, 19, 26,
                               5, 0, 1, 22, 60, 26, 7, 1, 18, 22, 84, 53, 85, 119,
@@ -27,14 +36,23 @@ test_query_vector = np.array([0, 16, 35, 5, 32, 31, 14, 10, 11, 78, 55, 10, 45, 
                               11, 4, 0, 0, 1, 26, 47, 23, 4, 0, 0, 4, 38, 83,
                               30, 14, 9, 4, 9, 17, 23, 41, 0, 0, 2, 8, 19, 25,
                               23, 1])
-# print(search_inner(vectors, spts, k, test_start, test_query))
 
-print(search(vectors,spts,k,test_start,test_query_vector))
-
-
-# gt test
-
-gts = get_gts(vectors, hcnng)
 tries = build_tries(gts)
 
-print(search_by_gts(vectors, tries, gts, k, test_start, test_query_vector))
+
+
+visited, knn = verified_search(vectors, tries, gts, k, test_start, test_query_vector)
+
+
+print(visited)
+print(knn)
+
+hash_list = gts_to_hash(gts)
+root_hash_DO = get_merkle_root(hash_list)
+vos = vo_construction(gts, visited)
+root_hash_Client = vo_compute(vos).data
+
+print(root_hash_Client == root_hash_DO)
+
+
+
