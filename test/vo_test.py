@@ -12,12 +12,12 @@ from modules.outsource.VO import *
 vectors = read_fvecs("../resource/siftsmall/siftsmall_base.fvecs")[:20]
 indexes = range(vectors.shape[0])
 
-# hcnng = createHCNNG(vectors, indexes, 5, 3)
-# with open("hcnng.pkl", "wb") as f:
-#     pickle.dump(hcnng, f)
+hcnng = createHCNNG(vectors, indexes, 5, 3)
+with open("hcnng.pkl", "wb") as f:
+    pickle.dump(hcnng, f)
 
-with open("hcnng.pkl", "rb") as f:
-    hcnng = pickle.load(f)
+# with open("hcnng.pkl", "rb") as f:
+#     hcnng = pickle.load(f)
 print(hcnng)
 gts = get_gts(vectors, hcnng)
 
@@ -39,20 +39,14 @@ test_query_vector = np.array([0, 16, 35, 5, 32, 31, 14, 10, 11, 78, 55, 10, 45, 
 
 tries = build_tries(gts)
 
-
-
 visited, knn = verified_search(vectors, tries, gts, k, test_start, test_query_vector)
-
 
 print(visited)
 print(knn)
 
-hash_list = gts_to_hash(gts)
+hash_list = gts_to_hash(gts, vectors)
 root_hash_DO = get_merkle_root(hash_list)
-vos = vo_construction(gts, visited)
+vos = vo_construction(gts, visited, vectors)
 root_hash_Client = vo_compute(vos).data
 
 print(root_hash_Client == root_hash_DO)
-
-
-

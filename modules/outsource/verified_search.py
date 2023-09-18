@@ -31,4 +31,3 @@ def verified_search(vectors, tries, gts, k, start_index, query_vector):
                 heapq.heappush(candidate, (dist, neighbor))
 
     return visited, [nearest_neighbor[1] for nearest_neighbor in sorted(nearest_neighbors, key=lambda x: -x[0])]
-

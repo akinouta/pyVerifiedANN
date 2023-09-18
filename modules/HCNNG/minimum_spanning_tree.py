@@ -1,3 +1,4 @@
+import numpy as np
 
 from .util import *
 from .data_structure import *
@@ -29,13 +30,13 @@ def complete_graph(indexes, vectors):
     return adjacency_matrix
 
 
-def minimum(closedges):
+def minimum(closedges, degrees):
     size = len(closedges)
     min_mark = -1
     mincost = np.finfo(np.float32).max  # 获取float32类型的最大值
 
     for i in range(size):
-        if closedges[i].lowcost < mincost and closedges[i].is_tree is False:
+        if closedges[i].lowcost < mincost and closedges[i].is_tree is False and degrees[i] <= Edge.MAX_DEGREE:
             min_mark = i
             mincost = closedges[i].lowcost
 
@@ -58,6 +59,7 @@ def prim(graph, indexes):
     num_vertices = graph.shape[0]
     # 初始化访问标记数组，所有顶点初始为未访问（False）
     closedges = [Closedge(k, graph[k][j], False) for j in range(num_vertices)]
+    degrees = np.zeros(num_vertices, dtype=np.int32)
     # 最小生成树
     mst = set()
 
@@ -65,8 +67,10 @@ def prim(graph, indexes):
 
     for _ in range(num_vertices - 1):
         pre = k
-        k = minimum(closedges)
+        k = minimum(closedges, degrees)
         mst.add(Edge(graph[pre][k], indexes[pre], indexes[k]))
+        degrees[pre] += 1
+        degrees[k] += 1
         closedges[k].is_tree = True
         for j in range(num_vertices):
             tmp = graph[k][j]

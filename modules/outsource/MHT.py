@@ -7,7 +7,6 @@ def hash_data(data):
 
 
 def get_merkle_root(hash_list):
-
     while len(hash_list) > 1:
         temp_list = []
         for i in range(0, len(hash_list), 2):
@@ -27,10 +26,9 @@ def vectors_to_hash(str_vectors):
     return [hash_data(str_vector) for str_vector in str_vectors]
 
 
-def gt_to_hash(index, gt):
-    return hash_data(json_tricks.dumps({index: gt}))
+def gt_to_hash(index, gt, vector):
+    return hash_data(json_tricks.dumps((index, gt, vector)))
 
 
-def gts_to_hash(gts):
-    return [gt_to_hash(index, gt) for index, gt in enumerate(gts)]
-
+def gts_to_hash(gts, vectors):
+    return [gt_to_hash(index, gt, vectors[index]) for index, gt in enumerate(gts)]

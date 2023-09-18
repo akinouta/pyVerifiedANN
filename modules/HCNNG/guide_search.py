@@ -155,6 +155,17 @@ def build_tries(gts):
     return tries
 
 
+def build_dict_tries(gts):
+    tries = dict()
+
+    for index, gt in gts.items():
+        trie = Trie()
+        for key in gt.keys():
+            trie.insert(key)
+        tries[index]=trie
+
+    return tries
+
 def search_neighbors_by_gt(tire: Trie, gt, vector, query, cur_dim, judge):
     if tire.is_leaf:
         return gt[judge]

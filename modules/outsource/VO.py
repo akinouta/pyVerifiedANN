@@ -2,7 +2,7 @@ from .data_structure import *
 from .MHT import *
 
 
-def vo_construction(gts, visited):
+def vo_construction(gts, visited, vectors):
     vos = []
     num_vertices = len(gts)
 
@@ -11,7 +11,7 @@ def vo_construction(gts, visited):
         if index in visited:
             vos.append(
                 VO(
-                    json_tricks.dumps({index: gts[index]}),
+                    json_tricks.dumps((index, gts[index], vectors[index])),
                     False,
                     0,
                     index
@@ -20,7 +20,7 @@ def vo_construction(gts, visited):
         else:
             vos.append(
                 VO(
-                    gt_to_hash(index, gt),
+                    gt_to_hash(index, gt, vectors[index]),
                     True,
                     0,
                     index
@@ -61,7 +61,6 @@ def vo_construction(gts, visited):
 
 
 def vo_compute(vos):
-
     for vo in vos:
         if not vo.is_hash:
             vo.data = hash_data(vo.data)
