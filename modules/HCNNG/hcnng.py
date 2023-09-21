@@ -44,4 +44,5 @@ def createHCNNG(vectors, indexes, min_size_cluster, num_cluster):
         hcnng.update(
             hierarchical_clustering(vectors, indexes, min_size_cluster)
         )
+        print(num)
     return hcnng

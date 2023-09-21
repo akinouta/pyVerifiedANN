@@ -1,9 +1,8 @@
-
 import numpy as np
-from numba import jit, njit
+from numba import jit, njit, guvectorize, float64, float32
 
 
-@jit(nopython=True)
+@njit(cache=True, fastmath=True, nogil=True)
 def squared_euclidean_distance(vector1, vector2):
     """Calculate the squared Euclidean distance between two vectors.
 
@@ -20,7 +19,7 @@ def squared_euclidean_distance(vector1, vector2):
     return distance_sum
 
 
-@jit(nopython=True)
+@njit(float32(float32[:], float32[:]), cache=True, fastmath=True, nogil=True)
 def euclidean_distance(vector1, vector2):
     """Calculate the Euclidean distance between two vectors.
 
@@ -35,3 +34,11 @@ def euclidean_distance(vector1, vector2):
     for index in range(vector1.shape[0]):
         distance_sum += (vector1[index] - vector2[index]) ** 2
     return np.sqrt(distance_sum)
+
+
+@guvectorize([(float32[:], float32[:], float32[:])], '(n),(n)->()', target='parallel')
+def euclidean_distance_guvectorize(vector1, vector2, result):
+    distance_sum = 0.0
+    for i in range(vector1.shape[0]):
+        distance_sum += (vector1[i] - vector2[i]) ** 2
+    result[0] = np.sqrt(distance_sum)

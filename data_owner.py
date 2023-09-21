@@ -13,14 +13,24 @@ from modules.HCNNG.load_dataset import read_fvecs
 from modules.outsource.MHT import *
 
 
-def data_owner():
-    vectors = read_fvecs("./resource/siftsmall/siftsmall_base.fvecs")
+def data_owner(dataset="siftsmall", filename="siftsmall_base.fvecs"):
+    vectors = read_fvecs(f"./resource/{dataset}/{filename}")
     num_vertices = vectors.shape[0]
+    print(vectors.shape)
     indexes = range(num_vertices)
-    hcnng = createHCNNG(vectors, indexes, int(math.sqrt(num_vertices)), 20)
+
+    print("read")
+
+    hcnng = createHCNNG(vectors, indexes, 2000, 20)
+
+    print("hcnng done")
+
     gts = get_gts(vectors, hcnng)
     hash_list = gts_to_hash(gts, vectors)
     root_hash_DO = bytes.fromhex(get_merkle_root(hash_list))
+    print("mht done")
+
+
 
     # 生成RSA密钥对
     private_key = rsa.generate_private_key(
@@ -30,12 +40,6 @@ def data_owner():
     )
     public_key = private_key.public_key()
 
-    # 序列化公钥和私钥
-    pem_private = private_key.private_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PrivateFormat.TraditionalOpenSSL,
-        encryption_algorithm=serialization.NoEncryption()
-    )
     pem_public = public_key.public_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PublicFormat.SubjectPublicKeyInfo
