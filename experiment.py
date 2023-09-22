@@ -1,8 +1,13 @@
+import cProfile
+import pstats
+from io import StringIO
+
 import pandas as pd
 
 from server import *
 from data_owner import *
 from client import *
+from modules.HCNNG.hcnng import createHCNNG
 import os
 
 
@@ -19,7 +24,7 @@ def get_file_size_in_mb(file_path):
         return "文件未找到"
 
 
-if __name__ == '__main__':
+def exp1():
     # 数据持有者初始化并外包数据
     # data_owner(dataset="gist")
     # 服务器查询
@@ -65,4 +70,37 @@ if __name__ == '__main__':
     # 客户端验证
     # print(client_verified())
 
+
+def exp2():
+    vectors = read_fvecs(f"./resource/sift/sift_base.fvecs")
+    num_vertices = vectors.shape[0]
+    print(vectors.shape)
+    indexes = range(num_vertices)
+
+
+    # 创建一个cProfile.Profile对象
+    profiler = cProfile.Profile()
+
+    # 启用性能分析
+    profiler.enable()
+
+    # 运行您想要分析的代码
+    createHCNNG_parallel(vectors, indexes, 2000, 20)
+
+    # 禁用性能分析
+    profiler.disable()
+
+    # 创建一个pstats.Stats对象来查看和过滤性能数据
+    s = StringIO()
+    stats = pstats.Stats(profiler, stream=s).sort_stats("time")
+
+    # 过滤性能数据，只显示与“my_function”相关的记录
+    stats.print_stats("createHCNNG_parallel")
+
+    # 打印性能报告
+    print(s.getvalue())
+
+
+if __name__ == '__main__':
+    exp2()
 

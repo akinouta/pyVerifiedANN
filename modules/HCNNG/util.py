@@ -19,7 +19,8 @@ def squared_euclidean_distance(vector1, vector2):
     return distance_sum
 
 
-@njit(float32(float32[:], float32[:]), cache=True, fastmath=True, nogil=True)
+# @njit(float32(float32[:], float32[:]), cache=True, fastmath=True, nogil=True)
+@njit(cache=True, fastmath=True, nogil=True)
 def euclidean_distance(vector1, vector2):
     """Calculate the Euclidean distance between two vectors.
 

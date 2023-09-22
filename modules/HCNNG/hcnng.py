@@ -1,5 +1,7 @@
 import random
 
+from joblib import Parallel, delayed
+
 from .minimum_spanning_tree import *
 from .util import *
 
@@ -28,7 +30,8 @@ def hierarchical_clustering(vectors, indexes, min_size_cluster):
     else:
         index1, index2 = get_two_random_index(indexes)
         for index in indexes:
-            if euclidean_distance(vectors[index], vectors[index1]) < euclidean_distance(vectors[index],vectors[index2]):
+            if euclidean_distance(vectors[index], vectors[index1]) < euclidean_distance(vectors[index],
+                                                                                        vectors[index2]):
                 indexes1.append(index)
             else:
                 indexes2.append(index)
@@ -45,4 +48,21 @@ def createHCNNG(vectors, indexes, min_size_cluster, num_cluster):
             hierarchical_clustering(vectors, indexes, min_size_cluster)
         )
         print(num)
+    return hcnng
+
+
+def createHCNNG_parallel(vectors, indexes, min_size_cluster, num_cluster):
+    hcnng = set()
+
+    def inner_loop(num):
+        print(f"{num}down")
+        return hierarchical_clustering(vectors, indexes, min_size_cluster)
+
+    results = Parallel(n_jobs=-1, batch_size='auto', backend='loky')(
+        delayed(inner_loop)(num) for num in range(num_cluster)
+    )
+
+    for result in results:
+        hcnng.update(result)
+
     return hcnng

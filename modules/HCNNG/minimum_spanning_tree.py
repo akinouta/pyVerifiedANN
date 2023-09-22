@@ -5,7 +5,8 @@ from .util import *
 from .data_structure import *
 
 
-@njit(float32[:,:](int32[:], float32[:,:]), cache=True, fastmath=True, nogil=True)
+# @njit(float32[:,:](int32[:], float32[:,:]), cache=True, fastmath=True, nogil=True)
+@njit(cache=True, fastmath=True, nogil=True)
 def complete_graph(indexes, vectors):
     """
     生成完全图的邻接矩阵。
@@ -82,7 +83,8 @@ def prim(graph, indexes):
     return mst
 
 
-@njit(int32(int32[:], float32[:], int32[:], int32[:]), cache=True, fastmath=True, nogil=True)
+# @njit(int32(int32[:], float32[:], int32[:], int32[:]), cache=True, fastmath=True, nogil=True)
+@njit(cache=True, fastmath=True, nogil=True)
 def minimum_numba(end_array, lowcost_array, is_tree_array, degrees):
     size = end_array.shape[0]
     min_mark = -1
