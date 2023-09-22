@@ -1,0 +1,6 @@
+cryptography==35.0.0
+joblib==1.0.1
+json_tricks==3.17.3
+numba==0.53.1
+numpy==1.19.2
+pandas==1.1.5
