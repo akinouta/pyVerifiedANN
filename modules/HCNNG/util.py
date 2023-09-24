@@ -1,6 +1,6 @@
 import numpy as np
 from numba import jit, njit, guvectorize, float64, float32
-
+from .data_structure import *
 
 @njit(cache=True, fastmath=True, nogil=True)
 def squared_euclidean_distance(vector1, vector2):
@@ -43,3 +43,12 @@ def euclidean_distance_guvectorize(vector1, vector2, result):
     for i in range(vector1.shape[0]):
         distance_sum += (vector1[i] - vector2[i]) ** 2
     result[0] = np.sqrt(distance_sum)
+
+
+def tree_to_dict(trie_node :Trie):
+    if trie_node.is_leaf:
+        return list(trie_node.children.keys())
+    return {
+        "k": list(trie_node.children.keys()),
+        "v": [tree_to_dict(child) for child in trie_node.children.values()]
+    }

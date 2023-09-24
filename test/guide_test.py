@@ -8,7 +8,6 @@ vectors = read_fvecs("../resource/siftsmall/siftsmall_base.fvecs")[:20]
 indexes = range(vectors.shape[0])
 
 hcnng = createHCNNG(vectors, indexes, 5, 20)
-print(hcnng)
 num_vertices = vectors.shape[0]
 
 # spt test
@@ -29,12 +28,10 @@ test_query_vector = np.array([0, 16, 35, 5, 32, 31, 14, 10, 11, 78, 55, 10, 45, 
                               23, 1])
 # print(search_inner(vectors, spts, k, test_start, test_query))
 
-print(search(vectors,spts,k,test_start,test_query_vector))
-
-
 # gt test
 
 gts = get_gts(vectors, hcnng)
-tries = build_tries(gts)
-
-print(search_by_gts(vectors, tries, gts, k, test_start, test_query_vector))
+# tries = build_tries(gts)
+#
+# print(search_by_gts(vectors, tries, gts, k, test_start, test_query_vector))
+search_neighbors_by_gt2(gts[1], vectors[1], test_query_vector)

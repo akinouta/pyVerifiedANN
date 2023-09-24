@@ -1,4 +1,5 @@
 import cProfile
+import json
 import pstats
 from io import StringIO
 
@@ -39,7 +40,6 @@ def exp1():
 
     print("read down")
 
-
     tries = build_tries(gts)
     print("build tries")
 
@@ -63,8 +63,6 @@ def exp1():
         print(f"文件大小：{file_size_mb} MB")
         df.loc[k] = file_size_mb
 
-
-
     df.index.name = 'k'
     df.to_excel("k-vosize.xlsx", index=True, sheet_name='Sheet1')
     # 客户端验证
@@ -77,30 +75,56 @@ def exp2():
     print(vectors.shape)
     indexes = range(num_vertices)
 
+    hcnng = createHCNNG_parallel(vectors, indexes, 2000, 20)
 
-    # 创建一个cProfile.Profile对象
-    profiler = cProfile.Profile()
+    neighborss = get_all_neighbors(hcnng, vectors.shape[0])
 
-    # 启用性能分析
-    profiler.enable()
+    gts = get_gts(vectors, hcnng)
+    tries = build_dict_tries(gts)
 
-    # 运行您想要分析的代码
-    createHCNNG_parallel(vectors, indexes, 2000, 20)
+    ks = range(10, 110, 10)
+    size_vos_gts = []
+    size_vos_nos = []
+    size_vos_trees = []
+    for k in ks:
+        print(k)
+        visited1, knn1 = verified_search(vectors, tries, gts, k, start, query_vector)
+        vos_gt = vo_construction(gts, visited1, vectors)
 
-    # 禁用性能分析
-    profiler.disable()
+        visited2, knn2 = verified_search_without_guide(vectors, neighborss, k, start, query_vector)
+        vos_no = vo_construction(gts, visited2, vectors)
 
-    # 创建一个pstats.Stats对象来查看和过滤性能数据
-    s = StringIO()
-    stats = pstats.Stats(profiler, stream=s).sort_stats("time")
+        vos_tree = vo_construction_with_tries(tries, gts, visited1, vectors)
 
-    # 过滤性能数据，只显示与“my_function”相关的记录
-    stats.print_stats("createHCNNG_parallel")
+        with open("./exp_data/vos_gt.pkl", "wb") as f:
+            pickle.dump(vos_gt, f)
 
-    # 打印性能报告
-    print(s.getvalue())
+        with open("./exp_data/vos_no.pkl", "wb") as f:
+            pickle.dump(vos_no, f)
+
+        with open("./exp_data/vos_tree.pkl", "wb") as f:
+            pickle.dump(vos_tree, f)
+
+        size_vos_gt = os.path.getsize("./exp_data/vos_gt.pkl") / (1024 ** 2)
+        size_vos_no = os.path.getsize("./exp_data/vos_no.pkl") / (1024 ** 2)
+        size_vos_tree = os.path.getsize("./exp_data/vos_tree.pkl") / (1024 ** 2)
+
+        size_vos_gts.append(size_vos_gt)
+        size_vos_nos.append(size_vos_no)
+        size_vos_trees.append(size_vos_tree)
+
+    df = pd.DataFrame(
+        {
+            "index": ks,
+            "size_vos_gt": size_vos_gts,
+            "size_vos_no": size_vos_nos,
+            "size_vos_tree": size_vos_trees
+        }
+    )
+    df.set_index('index', inplace=True)
+
+    df.to_excel("myexp.xlsx")
 
 
 if __name__ == '__main__':
     exp2()
-

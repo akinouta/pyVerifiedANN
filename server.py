@@ -21,7 +21,6 @@ def server(k, start_index, query_vector):
     vos = vo_construction(gts, visited, vectors)
     print("vo construct")
 
-
     with open("./communication_file/knn.pkl", "wb") as f:
         pickle.dump(knn, f)
 

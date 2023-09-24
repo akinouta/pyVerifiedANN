@@ -1,5 +1,7 @@
 import heapq
 
+import numpy as np
+
 from .util import *
 from .data_structure import *
 
@@ -138,6 +140,7 @@ def get_guided_tuple(vectors, index, neighbors, cur_dim, judge):
 
 def get_gts(vectors, hcnng):
     neighborss = get_all_neighbors(hcnng, vectors.shape[0])
+
     gts = []
     for index, neighbors in enumerate(neighborss):
         gts.append(get_guided_tuple(vectors, index, neighbors, 0, ""))
@@ -158,13 +161,14 @@ def build_tries(gts):
 def build_dict_tries(gts):
     tries = dict()
 
-    for index, gt in gts.items():
+    for index, gt in enumerate(gts):
         trie = Trie()
         for key in gt.keys():
             trie.insert(key)
-        tries[index]=trie
+        tries[index] = trie
 
     return tries
+
 
 def search_neighbors_by_gt(tire: Trie, gt, vector, query, cur_dim, judge):
     if tire.is_leaf:
@@ -174,6 +178,16 @@ def search_neighbors_by_gt(tire: Trie, gt, vector, query, cur_dim, judge):
             return search_neighbors_by_gt(tire.children["0"], gt, vector, query, cur_dim + 1, judge + "0")
         else:
             return search_neighbors_by_gt(tire.children["1"], gt, vector, query, cur_dim + 1, judge + "1")
+
+
+def search_neighbors_by_gt2(gt, vector, query):
+    max_code_len = max([len(code) for code, neighbors in gt.items()])
+    judge = np.zeros(max_code_len, dtype=np.int32)
+    for cur_dim in np.arange(max_code_len):
+        if query[cur_dim] < vector[cur_dim]:
+            judge[cur_dim] = 0
+        else:
+            judge[cur_dim] = 1
 
 
 def search_by_gts(vectors, tries, gts, k, start_index, query_vector):
