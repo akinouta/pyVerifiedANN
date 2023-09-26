@@ -71,7 +71,7 @@ def exp1():
 
 
 def exp2():
-    vectors = read_fvecs_fast(f"./resource/gist/gist_base.fvecs", 100)
+    vectors = read_fvecs_fast(f"./resource/sift/sift_base.fvecs", 100)
     num_vertices = vectors.shape[0]
     print(vectors.shape)
     indexes = range(num_vertices)
