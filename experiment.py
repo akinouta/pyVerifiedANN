@@ -89,12 +89,12 @@ def exp2():
     for k in ks:
         print(k)
         visited1, knn1 = verified_search(vectors, tries, gts, k, start, query_vector)
-        vos_gt = vo_construction(gts, visited1, vectors)
+        vos_gt = vo_construction_simple(gts, visited1, vectors)
 
         visited2, knn2 = verified_search_without_guide(vectors, neighborss, k, start, query_vector)
-        vos_no = vo_construction(gts, visited2, vectors)
+        vos_no = vo_construction_simple(gts, visited2, vectors)
 
-        vos_tree = vo_construction_with_tries(tries, gts, visited1, vectors)
+        vos_tree = vo_construction_with_tries_simple(tries, gts, visited1, vectors)
 
         with open("./exp_data/vos_gt.pkl", "wb") as f:
             pickle.dump(vos_gt, f)
@@ -105,9 +105,9 @@ def exp2():
         with open("./exp_data/vos_tree.pkl", "wb") as f:
             pickle.dump(vos_tree, f)
 
-        size_vos_gt = os.path.getsize("./exp_data/vos_gt.pkl") / (1024 ** 2)
-        size_vos_no = os.path.getsize("./exp_data/vos_no.pkl") / (1024 ** 2)
-        size_vos_tree = os.path.getsize("./exp_data/vos_tree.pkl") / (1024 ** 2)
+        size_vos_gt = os.path.getsize("./exp_data/vos_gt.pkl") / (1024)
+        size_vos_no = os.path.getsize("./exp_data/vos_no.pkl") / (1024)
+        size_vos_tree = os.path.getsize("./exp_data/vos_tree.pkl") / (1024)
 
         size_vos_gts.append(size_vos_gt)
         size_vos_nos.append(size_vos_no)
