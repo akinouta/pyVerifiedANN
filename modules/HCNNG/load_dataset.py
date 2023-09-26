@@ -3,7 +3,7 @@ import struct
 import numpy as np
 
 
-def read_fvecs(file_path):
+def read_fvecs(file_path, dim_given=None):
     vectors = []
     with open(file_path, 'rb') as f:
         while True:
@@ -19,14 +19,14 @@ def read_fvecs(file_path):
                 float_byte = f.read(4)
                 vector[i] = struct.unpack('f', float_byte)[0]
             vectors.append(vector)
-    return np.array(vectors)
+        if dim_given:
+            print(dim_given)
+            return np.array(vectors)[:, :dim_given]
 
+    return np.array(vectors)
 
 # # 使用函数读取.fvecs文件
 # file_path = r'../../resource/siftsmall/siftsmall_base.fvecs'
 # vectors = read_fvecs(file_path)
 # print(vectors)
 # print(vectors.shape)
-
-
-

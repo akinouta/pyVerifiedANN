@@ -70,7 +70,7 @@ def exp1():
 
 
 def exp2():
-    vectors = read_fvecs(f"./resource/sift/sift_base.fvecs")
+    vectors = read_fvecs(f"./resource/gist/gist_base.fvecs", 100)
     num_vertices = vectors.shape[0]
     print(vectors.shape)
     indexes = range(num_vertices)
@@ -123,7 +123,7 @@ def exp2():
     )
     df.set_index('index', inplace=True)
 
-    df.to_excel("myexp.xlsx")
+    df.to_excel("myexp_gist.xlsx")
 
 
 if __name__ == '__main__':
