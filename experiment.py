@@ -5,6 +5,7 @@ from io import StringIO
 
 import pandas as pd
 
+from modules.HCNNG.load_dataset import *
 from server import *
 from data_owner import *
 from client import *
@@ -70,7 +71,7 @@ def exp1():
 
 
 def exp2():
-    vectors = read_fvecs(f"./resource/gist/gist_base.fvecs", 100)
+    vectors = read_fvecs_fast(f"./resource/gist/gist_base.fvecs", 100)
     num_vertices = vectors.shape[0]
     print(vectors.shape)
     indexes = range(num_vertices)
@@ -124,6 +125,10 @@ def exp2():
     df.set_index('index', inplace=True)
 
     df.to_excel("myexp_gist.xlsx")
+
+
+
+
 
 
 if __name__ == '__main__':
