@@ -132,4 +132,4 @@ def exp2():
 
 
 if __name__ == '__main__':
-    exp2()
+    read_glove("./resource/glove/glove.6B.100d.txt")

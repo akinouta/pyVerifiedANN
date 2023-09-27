@@ -169,6 +169,8 @@ def vo_construction_simple(gts, visited, vectors):
     vos = []
     num_vertices = len(gts)
 
+    num_hash = 0
+
     # leaf node
     for index, gt in enumerate(gts):
         if index in visited:

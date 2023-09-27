@@ -48,3 +48,16 @@ def read_fvecs_fast(file_path, dim_given=None):
         return np.array(vectors)[:, :dim_given]
     else:
         return np.array(vectors)
+
+
+def read_glove(file_path):
+    vectors= []
+    with open(file_path, "r", encoding="utf8") as f:
+        for line in f:
+            tokens = line.rstrip('\n').split()
+            word = tokens[0]
+            vector = np.array(tokens[1:], dtype=np.float32)
+            vectors.append(vector)
+
+    vectors = np.array(vectors)
+    print(vectors.shape)
