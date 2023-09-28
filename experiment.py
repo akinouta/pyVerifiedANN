@@ -179,6 +179,5 @@ def exp3(dataset):
 
 
 if __name__ == '__main__':
-    exp3("sift")
     exp3("gist")
     exp3("glove")
