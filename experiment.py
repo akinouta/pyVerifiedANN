@@ -91,10 +91,10 @@ def exp2():
     for k in ks:
         print(k)
         visited1, knn1 = verified_search(vectors, tries, gts, k, start, query_vector)
-        vos_gt = vo_construction_simple(gts, visited1, vectors)
+        vos_gt, _ = vo_construction_simple(gts, visited1, vectors)
 
         visited2, knn2 = verified_search_without_guide(vectors, neighborss, k, start, query_vector)
-        vos_no = vo_construction_simple(gts, visited2, vectors)
+        vos_no, _ = vo_construction_simple(gts, visited2, vectors)
 
         vos_tree = vo_construction_with_tries_simple(tries, gts, visited1, vectors)
 
@@ -128,5 +128,57 @@ def exp2():
     df.to_excel("glove-k-vosize.xlsx")
 
 
+def exp3(dataset):
+    num_con_comp_gts = []
+    num_con_comp_nos = []
+
+    num_decon_comp_gts = []
+    num_decon_comp_nos = []
+
+    k = 20
+    vectors_meta = np.load(rf"./resource/{dataset}/{dataset}.npy")
+    print(f"vectors_meta:{vectors_meta.shape}")
+    s = int(vectors_meta.shape[0] / 10)
+    num_range = list(range(s, vectors_meta.shape[0], s))
+    for num in num_range:
+        vectors = vectors_meta[:num, :]
+
+        num_vertices = vectors.shape[0]
+        indexes = range(num_vertices)
+        hcnng = createHCNNG_parallel(vectors, indexes, 2000, 20)
+        neighborss = get_all_neighbors(hcnng, vectors.shape[0])
+        gts = get_gts(vectors, hcnng)
+        tries = build_dict_tries(gts)
+
+        visited1, knn1 = verified_search(vectors, tries, gts, k, start, query_vector)
+        vos_gt, num_con_comp_gt = vo_construction_simple(gts, visited1, vectors)
+
+        visited2, knn2 = verified_search_without_guide(vectors, neighborss, k, start, query_vector)
+        vos_no, num_con_comp_no = vo_construction_simple(gts, visited2, vectors)
+
+        _, num_decon_comp_gt = vo_compute_simple(vos_gt)
+        _, num_decon_comp_no = vo_compute_simple(vos_no)
+
+        num_con_comp_gts.append(num_con_comp_gt)
+        num_con_comp_nos.append(num_con_comp_no)
+        num_decon_comp_gts.append(num_decon_comp_gt)
+        num_decon_comp_nos.append(num_decon_comp_no)
+
+    df = pd.DataFrame(
+        {
+            "index": num_range,
+            "num_con_comp_gts": num_con_comp_gts,
+            "num_con_comp_nos": num_con_comp_nos,
+            "num_decon_comp_gts": num_decon_comp_gts,
+            "num_decon_comp_nos": num_decon_comp_nos
+        }
+    )
+    df.set_index('index', inplace=True)
+
+    df.to_excel(rf"{dataset}-datasize-computeNum.xlsx")
+
+
 if __name__ == '__main__':
-    exp2()
+    exp3("sift")
+    exp3("gist")
+    exp3("glove")

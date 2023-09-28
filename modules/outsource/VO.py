@@ -191,6 +191,7 @@ def vo_construction_simple(gts, visited, vectors):
                     index
                 )
             )
+            num_hash += 1
 
     # merge
     vo_high = 1
@@ -212,6 +213,7 @@ def vo_construction_simple(gts, visited, vectors):
                         vos[index].site // 2  # 向下取整
                     )
                 )
+                num_hash += 1
                 index += 1
             # 不可以合并
             else:
@@ -222,7 +224,7 @@ def vo_construction_simple(gts, visited, vectors):
         vos = new_vos
         vo_high *= 2
 
-    return vos
+    return vos, num_hash
 
 
 def vo_construction_with_tries_simple(tries, gts, visited, vectors):
@@ -281,3 +283,51 @@ def vo_construction_with_tries_simple(tries, gts, visited, vectors):
         vo_high *= 2
 
     return vos
+
+
+def vo_compute_simple(vos):
+    num_hash = 0
+    for vo in vos:
+        if not vo.is_hash:
+            vo.data = "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e"
+            vo.is_hash = True
+            num_hash += 1
+
+    while len(vos) != 1:
+
+        new_vos = []
+        num_vos = len(vos)
+
+        index = 0
+
+        while index < num_vos:
+            # 向上合并
+            if index + 1 < num_vos and vos[index].site % 2 == 0 and vos[index].level == vos[index + 1].level:
+                new_vos.append(
+                    VO(
+                        "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e",
+                        True,
+                        vos[index].level + 1,
+                        vos[index].site // 2
+                    )
+                )
+                num_hash += 1
+                index += 1
+            else:
+                new_vos.append(vos[index])
+
+            index += 1
+
+        last = len(new_vos) - 1
+        if last > 0 and new_vos[last].level < new_vos[last - 1].level:
+            difference = new_vos[last - 1].level - new_vos[last].level
+            new_vos[last].level = new_vos[last - 1].level
+            # new_vos[last].site /= 2 ** difference
+            for i in range(difference):
+                new_vos[last].data = "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e"
+                new_vos[last].site //= 2
+                num_hash += 1
+
+        vos = new_vos
+
+    return vos[0], num_hash
