@@ -26,7 +26,7 @@ def hierarchical_clustering(vectors, indexes, min_size_cluster):
     indexes2 = []
 
     if size < min_size_cluster:
-        return mst3(vectors, np.array(indexes, dtype=np.float32))
+        return mst3(vectors, np.array(indexes, dtype=np.int))
     else:
         index1, index2 = get_two_random_index(indexes)
         for index in indexes:
