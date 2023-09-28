@@ -72,7 +72,7 @@ def exp1():
 
 
 def exp2():
-    vectors = np.load("/resource/glove/glove.npy")
+    vectors = np.load("./resource/glove/glove.npy")
     num_vertices = vectors.shape[0]
     print(vectors.shape)
     indexes = range(num_vertices)
