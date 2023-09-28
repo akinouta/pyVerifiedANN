@@ -51,13 +51,14 @@ def read_fvecs_fast(file_path, dim_given=None):
 
 
 def read_glove(file_path):
-    vectors= []
+    vectors = []
     with open(file_path, "r", encoding="utf8") as f:
         for line in f:
             tokens = line.rstrip('\n').split()
-            word = tokens[0]
-            vector = np.array(tokens[1:], dtype=np.float32)
-            vectors.append(vector)
+            if len(tokens) == 101:
+                vector = np.array(tokens[1:], dtype=np.float32)
+                vectors.append(vector)
 
-    vectors = np.array(vectors)
+    vectors = np.array(vectors)[:1000000, :]
     print(vectors.shape)
+    return vectors

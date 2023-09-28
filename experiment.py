@@ -3,6 +3,7 @@ import json
 import pstats
 from io import StringIO
 
+import numpy as np
 import pandas as pd
 
 from modules.HCNNG.load_dataset import *
@@ -127,9 +128,9 @@ def exp2():
     df.to_excel("myexp_gist.xlsx")
 
 
-
-
-
-
 if __name__ == '__main__':
-    read_glove("./resource/glove/glove.6B.100d.txt")
+    vectors = read_fvecs_fast(f"./resource/gist/gist_base.fvecs", 100)
+    np.save(f"./resource/gist/gist.npy", vectors)
+
+    vectors = np.load(f"./resource/gist/gist.npy")
+    print(vectors.shape)
