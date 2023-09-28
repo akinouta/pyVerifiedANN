@@ -72,7 +72,7 @@ def exp1():
 
 
 def exp2():
-    vectors = read_fvecs_fast(f"./resource/sift/sift_base.fvecs", 100)
+    vectors = np.load("/resource/glove/glove.npy")
     num_vertices = vectors.shape[0]
     print(vectors.shape)
     indexes = range(num_vertices)
@@ -125,12 +125,8 @@ def exp2():
     )
     df.set_index('index', inplace=True)
 
-    df.to_excel("myexp_gist.xlsx")
+    df.to_excel("glove-k-vosize.xlsx")
 
 
 if __name__ == '__main__':
-    vectors = read_fvecs_fast(f"./resource/gist/gist_base.fvecs", 100)
-    np.save(f"./resource/gist/gist.npy", vectors)
-
-    vectors = np.load(f"./resource/gist/gist.npy")
-    print(vectors.shape)
+    exp2()
