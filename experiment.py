@@ -174,9 +174,61 @@ def exp3(dataset):
         }
     )
     df.set_index('index', inplace=True)
-
     df.to_excel(rf"{dataset}-datasize-computeNum.xlsx")
 
 
+def exp4(dataset):
+    size_vos_gts = []
+    size_vos_nos = []
+
+    vectors = np.load(rf"./resource/{dataset}/{dataset}.npy")
+    print(f"vectors_meta:{vectors.shape}")
+    num_vertices = vectors.shape[0]
+    indexes = range(num_vertices)
+    hcnng = createHCNNG_parallel(vectors, indexes, 2000, 20)
+    neighborss = get_all_neighbors(hcnng, vectors.shape[0])
+    gts = get_gts(vectors, hcnng)
+    tries = build_dict_tries(gts)
+
+    visited_muti1 = set()
+    visited_muti2 = set()
+
+    query_num=range(0, 100)
+
+    for start in query_num:
+        visited1, knn1 = verified_search(vectors, tries, gts, k, start, query_vector)
+        visited_muti1.update(visited1)
+
+        visited2, knn2 = verified_search_without_guide(vectors, neighborss, k, start, query_vector)
+        visited_muti2.update(visited2)
+
+        if start != 0 and start % 10 == 0:
+            vos_gt, _ = vo_construction_simple(gts, visited1, vectors)
+            with open("./exp_data/vos_gt.pkl", "wb") as f:
+                pickle.dump(vos_gt, f)
+
+            vos_no, _ = vo_construction_simple(gts, visited2, vectors)
+            with open("./exp_data/vos_no.pkl", "wb") as f:
+                pickle.dump(vos_no, f)
+
+            size_vos_gt = os.path.getsize("./exp_data/vos_gt.pkl") / (1024)
+            size_vos_no = os.path.getsize("./exp_data/vos_no.pkl") / (1024)
+            size_vos_gts.append(size_vos_gt)
+            size_vos_nos.append(size_vos_no)
+
+    df = pd.DataFrame(
+        {
+            "qn": query_num,
+            "size_vos_gt": size_vos_gts,
+            "size_vos_no": size_vos_nos,
+        }
+    )
+    df.set_index('qn', inplace=True)
+
+    df.to_excel(f"{dataset}-qn-vosize.xlsx")
+
 if __name__ == '__main__':
+    exp3("sift")
+    exp3("gist")
     exp3("glove")
+
