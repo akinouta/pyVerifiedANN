@@ -193,7 +193,7 @@ def exp4(dataset):
     visited_muti1 = set()
     visited_muti2 = set()
 
-    query_num=range(0, 100)
+    query_num = range(0, 100)
 
     for start in query_num:
         visited1, knn1 = verified_search(vectors, tries, gts, k, start, query_vector)
@@ -227,8 +227,45 @@ def exp4(dataset):
 
     df.to_excel(f"{dataset}-qn-vosize.xlsx")
 
-if __name__ == '__main__':
-    exp3("sift")
-    exp3("gist")
-    exp3("glove")
 
+def exp5(dataset):
+    time_tree=[]
+    time_no_guide=[]
+
+    vectors = np.load(rf"./resource/{dataset}/{dataset}.npy")
+    print(f"vectors_meta:{vectors.shape}")
+    num_vertices = vectors.shape[0]
+    indexes = range(num_vertices)
+    hcnng = createHCNNG_parallel(vectors, indexes, 2000, 20)
+    neighborss = get_all_neighbors(hcnng, vectors.shape[0])
+    gts = get_gts(vectors, hcnng)
+    tries = build_dict_tries(gts)
+
+    ks = range(10, 110, 10)
+
+    for k in ks:
+        print(k)
+        visited1, knn1, ndc1 = verified_search(vectors, tries, gts, k, start, query_vector)
+        print(rf"ndc1:{ndc1}")
+        time_tree.append(ndc1)
+        visited2, knn2, ndc2 = verified_search_without_guide(vectors, neighborss, k, start, query_vector)
+        print(rf"ndc1:{ndc2}")
+        time_no_guide.append(ndc2)
+
+
+    df = pd.DataFrame(
+        {
+            "index": ks,
+            "time_guide": time_tree,
+            "time_no_guide": time_no_guide,
+        }
+    )
+    df.set_index('index', inplace=True)
+
+    df.to_excel(rf"{dataset}-k-speedup.xlsx")
+
+
+if __name__ == '__main__':
+    exp5("sift")
+    exp5("gist")
+    exp5("glove")
